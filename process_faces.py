@@ -15,8 +15,14 @@ for root, dirs, files in os.walk(images_dir):
         if file.endswith("jpg"):
             path = os.path.join(root,file)
             label = os.path.basename(os.path.dirname(path))
-            print(label, "@", path)
+            #print(label, "@", path)
             image = Image.open(path).convert("L") # "L" pentru grayscale
             image_mat = np.array(image, "uint8")
-            face = faceCascade.detectMultiScale(image, scaleFactor=1.5, minNeighbors=5)
-            
+            faces = faceCascade.detectMultiScale(image_mat)
+            for (x,y,w,h) in faces:
+                face = image_mat[y:y+h, x:x+w]
+                train_faces.append(face)
+                train_labels.append(label)
+
+#print(train_faces)
+#print(train_labels)

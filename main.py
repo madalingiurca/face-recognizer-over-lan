@@ -6,7 +6,7 @@ rect_color = (255,0,0)
 while True:
     ret, frame = cap.read()
     grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = faceCascade.detectMultiScale(grayFrame, scaleFactor=1.2, minNeighbors=2)
+    faces = faceCascade.detectMultiScale(grayFrame)
     for (x,y,w,h) in faces:
         print(x,y,w,h)
         cv2.rectangle(frame, (x,y), (x+w, y+h), rect_color, 2)
