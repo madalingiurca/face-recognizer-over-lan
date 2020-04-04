@@ -28,6 +28,7 @@ for root, dirs, files in os.walk(images_dir):
                 for (x,y,w,h) in faces:
                     cv2.imshow("face", image_mat[y:y+h, x:x+w])
                 if cv2.waitKey(20) & 0xFF == ord('q'):
+                #if cv2.waitKey(20)==ord('q'):
                     break
 
 
