@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import pickle
 
-
+###NEW UPDATEEEE####
 faceCascade = cv2.CascadeClassifier("venv/Lib/site-packages/cv2/data/haarcascade_frontalface_default.xml")
 base_dir = os.path.dirname(os.path.abspath(__file__))
 images_dir = os.path.join(base_dir, 'Faces')
