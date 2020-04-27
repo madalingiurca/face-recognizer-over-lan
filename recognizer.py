@@ -1,5 +1,6 @@
 import cv2
 import pickle
+#prima implementare
 def start_reco(s):
     cap = cv2.VideoCapture(0)
     faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_alt_tree.xml")

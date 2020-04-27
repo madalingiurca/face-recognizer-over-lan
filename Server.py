@@ -1,5 +1,21 @@
 from socket import *
 from threading import *
+import cv2 #pentru debug/vizualizarea imaginilor primite pe server
+
+import numpy
+
+import server_utils
+
+
+def recvall(sock, count):
+    buf = b''
+    while count:
+        newbuf = sock.recv(count)
+        if not newbuf: return None
+        buf += newbuf
+        count -= len(newbuf)
+    return buf
+
 
 HOST = ''
 PORT = 8888
@@ -16,21 +32,35 @@ except error as e:
 s.listen(10)
 print('Socket listening')
 
+face_tag = server_utils.load_resources()
 
-def thread_comm(conn, addr):
+def analyze(conn, addr):
     clients_list[addr] = 1
     while True:
-        msg = conn.recv(1024).decode('ascii')
-        if msg == '{quit}' or not msg:
-            print(addr, "DISCONNECTED")
-            conn.send(bytes("Disconnected!", 'ascii'))
-            conn.close()
-            break
-        print(addr, msg)
+        try:
+            length = int.from_bytes(conn.recv(16), 'big')  # se primeste numarul de biti ce urmeaza a fi primiti
+            stringData = recvall(conn, int(length))
+            encodedimage = numpy.fromstring(stringData, dtype='uint8')
+            decimg = cv2.imdecode(encodedimage, 1)
 
+            #cv2.imshow("Server", decimg)
+            persons = server_utils.detect_face(decimg)
+
+            for p in persons:
+                if p in face_tag:
+                    print(face_tag[p])
+                else:
+                    print("Unknown")
+
+            cv2.waitKey(100)
+        except Exception as e:
+            print(e)
+            print("Disconnected!")
+            cv2.destroyAllWindows()
+            break
 
 while True:
     conn, addr = s.accept()
     print("Connected with " + str(addr[0]) + ':' + str(addr[1]))
-    t = Thread(target=thread_comm, args=(conn, addr))
+    t = Thread(target=analyze, args=(conn, addr))
     t.start()
