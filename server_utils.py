@@ -1,10 +1,12 @@
 import pickle
 import cv2
 
-
+# Classifier(faceCascare) + Local Binary Patterns Histogram recognizer(ai)
 faceCascade = cv2.CascadeClassifier("Resources/haarcascade_frontalface_alt_tree.xml")
 ai = cv2.face.LBPHFaceRecognizer_create()
 ai.read("Resources/face_trainer.yml")
+
+
 def load_resources():
     """incarca dictionarul ce asociaza label-ul cu numele
         dictionarul a fost serializat intr-un fisier .rick folosind pickle"""
@@ -18,13 +20,19 @@ def load_resources():
 def detect_face(imag):
     """functia proceseaza o imagine
     extrage fata + asocierea unui tag"""
-    imag = cv2.cvtColor(imag, cv2.COLOR_BGR2GRAY) #convert RGB->GrayScale
+    imag = cv2.cvtColor(imag, cv2.COLOR_BGR2GRAY)  # convert RGB->GrayScale
     faces = faceCascade.detectMultiScale(imag)
-    persons = []
+    persons = {}
     for (x, y, w, h) in faces:
-        #extract region/regions of interest
-        roi = imag[y:y+h, x:x+w]
-        label, conf = ai.predict(roi) #label + confidence
-        if conf < 70:
-            persons.append(label)
+        # extract region/regions of interest
+        roi = imag[y:y + h, x:x + w]
+        label, conf = ai.predict(roi)  # label + confidence
+        print(str(label) + " DELIM " + str(conf))
+        if conf < 50:
+            persons[label] = 1
+        else:
+            persons[label] = 0
+    if not persons:
+        return None
+
     return persons

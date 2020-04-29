@@ -5,7 +5,7 @@ import cv2
 import pickle
 
 
-faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
+faceCascade = cv2.CascadeClassifier("Resources/haarcascade_frontalface_alt2.xml")
 base_dir = os.path.dirname(os.path.abspath(__file__))
 images_dir = os.path.join(base_dir, 'Faces')
 faces_dict = {}
@@ -40,9 +40,9 @@ for root, dirs, files in os.walk(images_dir):
 
 # print(train_faces)
 print(faces_dict)
-with open("faces.rick", "wb") as f:
+with open("Resources/faces.rick", "wb") as f:
     pickle.dump(faces_dict, f)
 
 reco = cv2.face.LBPHFaceRecognizer_create()
 reco.train(train_faces, np.array(train_labels))
-reco.save("face_trainer.yml")
+reco.save("Resources/face_trainer.yml")

@@ -1,5 +1,7 @@
-import cv2
 import pickle
+import cv2
+
+
 #prima implementare
 def start_reco(s):
     cap = cv2.VideoCapture(0)

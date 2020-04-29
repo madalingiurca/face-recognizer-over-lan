@@ -1,7 +1,7 @@
 from socket import *
 from threading import *
-import cv2 #pentru debug/vizualizarea imaginilor primite pe server
 
+import cv2  # pentru debug/vizualizarea imaginilor primite pe server
 import numpy
 
 import server_utils
@@ -34,6 +34,7 @@ print('Socket listening')
 
 face_tag = server_utils.load_resources()
 
+
 def analyze(conn, addr):
     clients_list[addr] = 1
     while True:
@@ -43,21 +44,24 @@ def analyze(conn, addr):
             encodedimage = numpy.fromstring(stringData, dtype='uint8')
             decimg = cv2.imdecode(encodedimage, 1)
 
-            #cv2.imshow("Server", decimg)
+            cv2.imshow("Server", decimg)
             persons = server_utils.detect_face(decimg)
-
-            for p in persons:
-                if p in face_tag:
-                    print(face_tag[p])
+            if not persons:
+                print("No face detected")
+                continue
+            for key in persons:
+                if persons[key] == 1:
+                    print(face_tag[key])
                 else:
                     print("Unknown")
 
-            cv2.waitKey(100)
+            cv2.waitKey(1000)
         except Exception as e:
             print(e)
             print("Disconnected!")
             cv2.destroyAllWindows()
             break
+
 
 while True:
     conn, addr = s.accept()
