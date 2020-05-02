@@ -1,6 +1,5 @@
 import pickle
 from socket import socket, SOCK_STREAM, AF_INET, error
-from threading import Thread
 
 import cv2
 import numpy
@@ -22,7 +21,6 @@ class Server:
         self.clients = {}
         self.clientsNo = 0
         self.faceTags = {}
-        self.threads = []  # type: List
         try:
             self.faceCascade = cv2.CascadeClassifier("Resources/haarcascade_frontalface_alt_tree.xml")
             self.ai = cv2.face.LBPHFaceRecognizer_create()
@@ -33,7 +31,7 @@ class Server:
     def load_resources(self):
         """incarca dictionarul ce asociaza label-ul cu numele
             dictionarul a fost serializat intr-un fisier .rick folosind pickle
-            incarca si modelul Local Binary Patter Histogram antrenat deja"""
+            incarca si modelul Local Binary Pattern Histogram antrenat deja"""
         self.ai.read("Resources/face_trainer.yml")
         with open("Resources/faces.rick", 'rb') as f:
             dump = pickle.load(f)  # type: dict
@@ -46,16 +44,10 @@ class Server:
         except error as err:
             print(err)
             exit(2)
-        while True:
-            conn, addr = self.sock.accept()
-            print("Connected with " + str(addr[0]) + ':' + str(addr[1]))
-            self.threads.append(Thread(target=self.handler, args=(conn, addr)))
-            self.threads[-1].start()
-            for t in self.threads:
-                if not t.is_alive():
-                    self.threads.remove(t)
 
     def stop(self):
+        # for t in self.threads: # type: Thread
+        #     t.join()
         self.sock.close()
 
     @staticmethod
@@ -90,31 +82,31 @@ class Server:
 
     def handler(self, conn, addr):
         self.clients[addr] = 1
-        while True:
-            try:
-                length = int.from_bytes(conn.recv(16), 'big')  # se primeste numarul de biti ce urmeaza a fi primiti
-                stringData = self.recvall(conn, int(length))
-                # print("data = ", stringData)
-                if stringData == b'':
-                    print("User ", addr[0], ":", addr[1], " disconnected!")
-                    break
-                encodedimage = numpy.fromstring(stringData, dtype='uint8')
-                decimg = cv2.imdecode(encodedimage, 1)
+        try:
+            length = int.from_bytes(conn.recv(16), 'big')  # se primeste numarul de biti ce urmeaza a fi primiti
+            stringData = self.recvall(conn, int(length))
+            # print("data = ", stringData)
+            if stringData == b'':
+                print("User ", addr[0], ":", addr[1], " disconnected!")
 
-                # cv2.imshow("Server", decimg)
-                persons = self.detect_face(decimg)
-                if not persons:
-                    print("No face detected")
-                    continue
-                for key in persons:
-                    if persons[key] == 1:
-                        print(self.faceTags[key])
-                    else:
-                        print("Unknown")
+            encodedimage = numpy.fromstring(stringData, dtype='uint8')
+            decimg = cv2.imdecode(encodedimage, 1)
 
-                cv2.waitKey(500)
-            except Exception as e:
-                print(e)
-                print("Disconnected!")
-                cv2.destroyAllWindows()
-                break
+            # cv2.imshow("Server", decimg)
+            persons = self.detect_face(decimg)
+            if not persons:
+                # print("No face detected")
+                return "No face detected"
+            for key in persons:
+                if persons[key] == 1:
+                    # print(self.faceTags[key])
+                    return self.faceTags[key]
+                else:
+                    # print("Unknown")
+                    return "Unknown"
+            cv2.waitKey(1000)
+        except Exception as e:
+            print(e)
+            print("Disconnected!")
+            cv2.destroyAllWindows()
+            return 0
