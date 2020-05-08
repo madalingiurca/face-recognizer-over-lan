@@ -7,5 +7,4 @@ if __name__ == '__main__':
     app = QApplication([])
     ServerGUI = Ui_MainWindow()
     ServerGUI.show()
-    # GUIThread = Thread(target=app.exec)
     app.exec()

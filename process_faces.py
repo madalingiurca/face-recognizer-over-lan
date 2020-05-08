@@ -38,7 +38,6 @@ for root, dirs, files in os.walk(images_dir):
                 train_faces.append(face)
                 train_labels.append(id_)
 
-# print(train_faces)
 print(faces_dict)
 with open("Resources/faces.rick", "wb") as f:
     pickle.dump(faces_dict, f)
@@ -46,3 +45,4 @@ with open("Resources/faces.rick", "wb") as f:
 reco = cv2.face.LBPHFaceRecognizer_create()
 reco.train(train_faces, np.array(train_labels))
 reco.save("Resources/face_trainer.yml")
+print("end")

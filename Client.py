@@ -1,15 +1,20 @@
 import socket
 import cv2
 import numpy
+import argparse
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(('localhost', 8888))
+
+parser=argparse.ArgumentParser(description='host, port')
+parser.add_argument('host', type=str)
+parser.add_argument('port', type=int)
+args=parser.parse_args()
+#s.connect(('localhost', 8888))
+s.connect((args.host, args.port))
 
 cap = cv2.VideoCapture(0)
 while True:
     ret, frame = cap.read()
-    #print("frame = " + str(len(frame)))
-
     # codarea imaginii pentru a fi trimisa
     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
     result, imgencode = cv2.imencode('.jpg', frame, encode_param)

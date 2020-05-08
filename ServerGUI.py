@@ -80,7 +80,7 @@ class Ui_MainWindow(QMainWindow):
             QMessageBox.warning(self, "Warning", str(e))
 
     def stop(self):
-        # TODO button_2 stop server implement
+        
         self.pushButton.setDisabled(False)
         self.pushButton_2.setDisabled(True)
         self.serv.stop()

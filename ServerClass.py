@@ -7,8 +7,8 @@ import numpy
 
 class Server:
     """clasa folosita de GUI pentru a gestiona functionarea serverului
-    TODO coduri erori 1-__init__() exeption
-                      2-listen() exception"""
+    coduri erori 1-__init__() exeption
+                 2-listen() exception"""
 
     def __init__(self, host, port):
         """pretty obvious
@@ -70,7 +70,6 @@ class Server:
             # extract region/regions of interest
             roi = imag[y:y + h, x:x + w]
             label, conf = self.ai.predict(roi)  # label + confidence
-            # print(str(label) + " DELIM " + str(conf))
             if conf < 50:
                 persons[label] = 1
             else:
@@ -85,24 +84,19 @@ class Server:
         try:
             length = int.from_bytes(conn.recv(16), 'big')  # se primeste numarul de biti ce urmeaza a fi primiti
             stringData = self.recvall(conn, int(length))
-            # print("data = ", stringData)
             if stringData == b'':
                 print("User ", addr[0], ":", addr[1], " disconnected!")
 
             encodedimage = numpy.fromstring(stringData, dtype='uint8')
             decimg = cv2.imdecode(encodedimage, 1)
 
-            # cv2.imshow("Server", decimg)
             persons = self.detect_face(decimg)
             if not persons:
-                # print("No face detected")
                 return "No face detected"
             for key in persons:
                 if persons[key] == 1:
-                    # print(self.faceTags[key])
                     return self.faceTags[key]
                 else:
-                    # print("Unknown")
                     return "Unknown"
             cv2.waitKey(1000)
         except Exception as e:
